@@ -1,4 +1,5 @@
-storage.txt
-secret
 *.swp
 *~
+*.pyc
+venv
+venv/*
