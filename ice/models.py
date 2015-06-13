@@ -1,6 +1,5 @@
 from ice import db
 
-
 """
 1. There exists a many to many to many relationship between events, roles, and users.
 The UserRoleEventDB class is designed as a lookup table to simulate this relationship.
@@ -9,7 +8,6 @@ The EventTagDB class is designed as a lookup table to simulate this relationship
 3. A LocationDB contains an AddressDB. All Users have Addresses,
 and all Events have Locations. The tables are organized as such.
 """
-
 
 class EventDB(db.Model):
     """Events object stores all necessary information for a site event.

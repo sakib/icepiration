@@ -1,3 +1,4 @@
+#!venv/bin/python
 from ice import app
 
 @app.route('/')
