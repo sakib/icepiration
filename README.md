@@ -23,3 +23,5 @@ Run the following commands:
 - "flush privileges"
 Quit out of mysql. Then run:
 - "python db_create.py"
+
+To check the database subsequently, run "mysql -uice -ppassword
