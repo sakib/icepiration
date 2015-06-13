@@ -16,17 +16,13 @@ class EventDB(db.Model):
     """
     __tablename__ = 'events'
     event_id = db.Column(db.Integer, primary_key=True, nullable=False)
+    organizer_id = db.Column(db.String(15), db.ForeignKey('users.user_id'), nullable=False)
+    location_id = db.Column(db.Integer, db.ForeignKey('locations.location_id'), nullable=False)
     name = db.Column(db.String(50), nullable=False)
-    organizer_id = db.Column(db.Integer, db.ForeignKey('users.user_id'),
-                             nullable=False)
-    location_id = db.Column(db.Integer, db.ForeignKey('locations.location_id'),
-                             nullable=False)
     price = db.Column(db.Float(precision=2), nullable=False)
     phone_num = db.Column(db.Integer)
     time = db.Column(db.DateTime)
 
-    def __repr__(self): # Print method. Do this for all for debugging
-        return '<Event %r>' % (self.name)
 
 class RoleDB(db.Model):
     """Role object defines the role that a user has at an event (maybe on site later).
@@ -53,13 +49,13 @@ class UserDB(db.Model):
 class UserRoleEventDB(db.Model):
     """Lookup table to connect users, events and roles.
     ure_id      : integer   -> unique primary key of an entry
-    user_id     : integer   -> foreign key into userDB
+    user_id     : string    -> foreign key into userDB
     role_id     : integer   -> foreign key into roleDB
     event_id    : integer   -> foreign key into eventDB
     """
     __tablename__ = 'userolevent'
     ure_id = db.Column(db.Integer, primary_key=True, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    user_id = db.Column(db.String(15), db.ForeignKey('users.user_id'), nullable=False)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.role_id'), nullable=False)
     event_id = db.Column(db.Integer, db.ForeignKey('events.event_id'), nullable=False)
 

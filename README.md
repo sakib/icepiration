@@ -11,3 +11,5 @@ To get set up on the project:
     - run "pip install -i https://testpypi.python.org/pypi Flask-Auth"
     - run "pip install https://launchpad.net/oursql/py3k/py3k-0.9.4/+download/oursql-0.9.4.zip":
 3. Run "run.py"
+
+Ubuntu: sudo apt-get install mysql-server libmysqlclient-dev
