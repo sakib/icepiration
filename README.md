@@ -7,7 +7,7 @@ To get set up on the project:
     - to activate run "source venv/bin/activate"
     - to deactivate run "deactivate"
 2. Use pip to install dependencies (in the virtualenv)
-    - run "pip install -r pip.req"
+    - run "pip install -r pip.req". Try skipping next two commands.
     - run "pip install -i https://testpypi.python.org/pypi Flask-Auth"
     - run "pip install https://launchpad.net/oursql/py3k/py3k-0.9.4/+download/oursql-0.9.4.zip":
 3. Run "python run.py"
@@ -15,13 +15,18 @@ To get set up on the project:
 Database stuff:
 
 Ubuntu: sudo apt-get install mysql-server libmysqlclient-dev
+Fedora: yum install python-migrate
+
 Run the following commands:
 - "sudo mysql"
 - "create database ice;"
-- "create user 'ice'@'localhost' identified by 'password';"
+- "create user 'ice'@'localhost' identified by 'ice';"
 - "grant all privileges on ice.* to 'ice'@'localhost';"
-- "flush privileges"
-Quit out of mysql. Then run:
-- "python db_create.py"
+- "flush privileges;"
+Quit out of mysql with "quit". Then run:
+- "./migrate.py db migrate"
+- "./migrate.py db upgrade"
 
-To check the database subsequently, run "mysql -uice -ppassword
+To check the database subsequently, run "mysql -uice -pice"
+To change database structure, edit ice/models.py, then run migrate and upgrade again.
+If you happen to remove the migrations folder, then run init, migrate, then upgrade.
