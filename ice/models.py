@@ -1,4 +1,7 @@
-from ice import db
+from ice import app, db
+from passlib.apps import custom_app_context as pwd_context
+from itsdangerous import (TimedJSONWebSignatureSerializer
+                          as Serializer, BadSignature, SignatureExpired)
 
 """
 1. There exists a many to many to many relationship between events, roles, and users.
@@ -13,13 +16,12 @@ class EventDB(db.Model):
     """Events object stores all necessary information for a site event.
     """
     __tablename__ = 'events'
-    event_id = db.Column(db.Integer, primary_key=True, nullable=False)
-    organizer_id = db.Column(db.String(15), db.ForeignKey('users.user_id'), nullable=False)
-    location_id = db.Column(db.Integer, db.ForeignKey('locations.location_id'), nullable=False)
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    organizer_id = db.Column(db.String(15), db.ForeignKey('users.username'), nullable=False)
+    location_id = db.Column(db.Integer, db.ForeignKey('locations.id'))
     name = db.Column(db.String(50), nullable=False)
     price = db.Column(db.Float(precision=2), nullable=False)
-    phone_num = db.Column(db.Integer)
-    time = db.Column(db.DateTime)
+    start_date = db.Column(db.Date)
 
 
 class RoleDB(db.Model):
@@ -27,7 +29,7 @@ class RoleDB(db.Model):
     privilege   : long int  -> could potentially be used to define privileges.
     """
     __tablename__ = 'roles'
-    role_id = db.Column(db.Integer, primary_key=True, nullable=False)
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
     name = db.Column(db.String(50), nullable=False)
     privilege = db.Column(db.BigInteger)
 
@@ -36,12 +38,31 @@ class UserDB(db.Model):
     """User object stores all necessary information for a site user.
     """
     __tablename__ = 'users'
-    user_id = db.Column(db.String(15), primary_key=True, nullable=False)
-    address_id = db.Column(db.Integer, db.ForeignKey('addresses.address_id'),
-                           nullable=False)
+    username = db.Column(db.String(15), primary_key=True, nullable=False)
     name = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(50), nullable=False)
-    phone_num = db.Column(db.Integer)
+    password_hash = db.Column(db.String(128), nullable=False)
+
+    def hash_password(self, password):
+        self.password_hash = pwd_context.encrypt(password)
+
+    def verify_password(self, password):
+        return pwd_context.verify(password, self.password_hash)
+
+    def generate_auth_token(self, expiration=600):
+        s = Serializer(app.config['SECRET_KEY'], expires_in=expiration)
+        return s.dumps({'username': self.username})
+
+    @staticmethod
+    def verify_auth_token(token):
+        s = Serializer(app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token)
+        except SignatureExpired:
+            return None # valid token, but expired
+        except BadSignature:
+            return None # invalid token
+        user = UserDB.query.get(data['username'])
 
 
 class UserRoleEventDB(db.Model):
@@ -52,17 +73,17 @@ class UserRoleEventDB(db.Model):
     event_id    : integer   -> foreign key into eventDB
     """
     __tablename__ = 'userolevent'
-    ure_id = db.Column(db.Integer, primary_key=True, nullable=False)
-    user_id = db.Column(db.String(15), db.ForeignKey('users.user_id'), nullable=False)
-    role_id = db.Column(db.Integer, db.ForeignKey('roles.role_id'), nullable=False)
-    event_id = db.Column(db.Integer, db.ForeignKey('events.event_id'), nullable=False)
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    user_id = db.Column(db.String(15), db.ForeignKey('users.username'), nullable=False)
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=False)
+    event_id = db.Column(db.Integer, db.ForeignKey('events.id'), nullable=False)
 
 
 class TagDB(db.Model):
     """Tag object to represent one tag on one event.
     """
     __tablename__ = 'tags'
-    tag_id = db.Column(db.Integer, primary_key=True, nullable=False)
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
     name = db.Column(db.String(25), nullable=False)
 
 
@@ -70,9 +91,9 @@ class EventTagDB(db.Model):
     """Lookup table to connect events with tags, and similarly, users with preferences.
     """
     __tablename__ = 'eventag'
-    et_id = db.Column(db.Integer, primary_key=True, nullable=False)
-    event_id = db.Column(db.Integer, db.ForeignKey('events.event_id'), nullable=False)
-    tag_id = db.Column(db.Integer, db.ForeignKey('tags.tag_id'), nullable=False)
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    event_id = db.Column(db.Integer, db.ForeignKey('events.id'), nullable=False)
+    tag_id = db.Column(db.Integer, db.ForeignKey('tags.id'), nullable=False)
 
 
 class AddressDB(db.Model):
@@ -80,7 +101,7 @@ class AddressDB(db.Model):
     type    : integer   -> 0:shipping; 1:billing; 2:both
     """
     __tablename__ = 'addresses'
-    address_id = db.Column(db.Integer, primary_key=True, nullable=False)
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
     address1 = db.Column(db.String(50), nullable=False)
     address2 = db.Column(db.String(50))
     city = db.Column(db.String(25), nullable=False)
@@ -96,8 +117,8 @@ class LocationDB(db.Model):
     Includes contact information, description, name, address, etc.
     """
     __tablename__ = 'locations'
-    location_id = db.Column(db.Integer, primary_key=True, nullable=False)
-    address_id = db.Column(db.Integer, db.ForeignKey('addresses.address_id'))
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    address_id = db.Column(db.Integer, db.ForeignKey('addresses.id'))
     name = db.Column(db.String(50), nullable=False)
     description = db.Column(db.String(250), nullable=False)
     contact_name = db.Column(db.String(50), nullable=False)
