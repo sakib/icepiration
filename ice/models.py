@@ -1,4 +1,4 @@
-from ice import app, db
+from __init__ import app, db
 from passlib.apps import custom_app_context as pwd_context
 from itsdangerous import (TimedJSONWebSignatureSerializer
                           as Serializer, BadSignature, SignatureExpired)

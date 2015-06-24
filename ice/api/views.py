@@ -1,8 +1,7 @@
 #!venv/bin/python
 from flask import request, jsonify, url_for, abort, g
-from ice import app, db, auth
-from models import UserDB, EventDB
-
+from ..__init__ import app, auth
+from ..models import *
 
 @app.route('/')
 @app.route('/index')
@@ -10,21 +9,23 @@ def index():
     return "Hello World!"
 
 
-@app.route('/api/resource')
+@app.route('/resource')
+@app.route('/resource/')
 @auth.login_required
 def get_resource():
     return jsonify({'data': "Hello, %s!" % g.user.username})
 
 
-@app.route('/api/token')
+@app.route('/token')
+@app.route('/token/')
 @auth.login_required
 def get_auth_token():
     token = g.user.generate_auth_token()
     return jsonify({ 'token': token.decode('ascii') })
 
 
-@app.route('/api/users', methods=['GET','POST'])
-@app.route('/api/users/', methods=['GET','POST'])
+@app.route('/users', methods=['GET','POST'])
+@app.route('/users/', methods=['GET','POST'])
 def users():
     if request.method == 'GET':
         lim = request.args.get('limit', 10)
@@ -51,16 +52,16 @@ def users():
 
 
 # Get a single user by username
-@app.route('/api/users/<username>', methods=['GET'])
-@app.route('/api/users/<username>/', methods=['GET'])
+@app.route('/users/<username>', methods=['GET'])
+@app.route('/users/<username>/', methods=['GET'])
 def user(username):
     if request.method == 'GET':
         user = UserDB.query.filter_by(username=username).first()
         return jsonify(user=get_user_json(user))
 
 
-@app.route('/api/events', methods=['GET','POST'])
-@app.route('/api/events/', methods=['GET','POST'])
+@app.route('/events', methods=['GET','POST'])
+@app.route('/events/', methods=['GET','POST'])
 def events():
     if request.method == 'GET':
         min = int(request.args.get('min', 0))
@@ -71,8 +72,8 @@ def events():
 
 
 # Get a single user by username
-@app.route('/api/events/<event_id>', methods=['GET'])
-@app.route('/api/events/<event_id>/', methods=['GET'])
+@app.route('/events/<event_id>', methods=['GET'])
+@app.route('/events/<event_id>/', methods=['GET'])
 def event(event_id):
     if request.method == 'GET':
         event = EventDB.query.filter_by(id=event_id).first()
