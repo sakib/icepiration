@@ -12,18 +12,79 @@ The EventTagDB class is designed as a lookup table to simulate this relationship
 and all Events have Locations. The tables are organized as such.
 """
 
+class AddressDB(db.Model):
+    """Address object to store necessary information. All users and locations have this.
+    type    : integer   -> 0:shipping; 1:billing; 2:both
+    """
+    __tablename__ = 'addresses'
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    address1 = db.Column(db.String(50), nullable=False)
+    address2 = db.Column(db.String(50))
+    city = db.Column(db.String(25), nullable=False)
+    country = db.Column(db.String(50), nullable=False)
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
+    state = db.Column(db.String(25), nullable=False)
+    type = db.Column(db.Integer, nullable=False)
+    zip = db.Column(db.String(25), nullable=False)
+    
+class ContactDB(db.Model):
+    """Contacts object to store necessary information. All users and ?? have this.
+    
+    """
+    __tablename__ = 'contacts'
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    name = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(50))
+    phone = db.Column(db.Integer)
+    address = db.Column(db.Integer, db.ForeignKey('addresses.id'), nullable=False)
+    contactType = db.Column(db.Integer, nullable=False)
+
 class EventDB(db.Model):
     """Events object stores all necessary information for a site event.
     """
     __tablename__ = 'events'
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     organizer_id = db.Column(db.String(15), db.ForeignKey('users.username'), nullable=False)
-    location_id = db.Column(db.Integer, db.ForeignKey('locations.id'))
+    location_id = db.Column(db.Integer, db.ForeignKey('locations.id'), nullable=False)
     name = db.Column(db.String(50), nullable=False)
-    price = db.Column(db.Float(precision=2), nullable=False)
-    start_date = db.Column(db.Date)
+    price_usd = db.Column(db.Float(precision=2), nullable=False)
+    start_date = db.Column(db.Date, nullable=False)
+    contact_id = db.Column(db.Integer, db.Foreignkey('contacts.id'), nullable=False)
+    event_schedule_id = db.Column(db.Integer, db.Foreignkey('event_schedules.id'), nullable=False)
+    
+class EventScheduleDB(db.Model):
+    """EventSchedules object stores all necessary information for the schedule of an event.
+    """
+    __tablename__ = 'event_schedules'
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    event_id = db.Column(db.Integer, db.ForeignKey('events.id'), nullable=False)
+    event_start_time = db.Column(db.DateTime, nullable=False)
+    event_end_time = db.Column(db.DateTime, nullable=False)
+    description = db.Column(db.String(250))
+    
+class EventTagDB(db.Model):
+    """Lookup table to connect events with tags, and similarly, users with preferences.
+    """
+    __tablename__ = 'eventag'
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    event_id = db.Column(db.Integer, db.ForeignKey('events.id'), nullable=False)
+    tag_id = db.Column(db.Integer, db.ForeignKey('tags.id'), nullable=False)
 
-
+class LocationDB(db.Model):
+    """Location object to store a map location, like a park.
+    All events have this, and subsequently may have addresses.
+    Includes contact information, description, name, address, etc.
+    """
+    __tablename__ = 'locations'
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    address_id = db.Column(db.Integer, db.ForeignKey('addresses.id'))
+    name = db.Column(db.String(50), nullable=False)
+    description = db.Column(db.String(500))
+    type = db.Column(db.Integer, nullable=False)
+    contact = db.Column(db.Integer, db.ForeignKey('contacts.id'), nullable=False)
+    url = db.Column(db.String(250))
+  
 class RoleDB(db.Model):
     """Role object defines the role that a user has at an event (maybe on site later).
     privilege   : long int  -> could potentially be used to define privileges.
@@ -33,14 +94,19 @@ class RoleDB(db.Model):
     name = db.Column(db.String(50), nullable=False)
     privilege = db.Column(db.BigInteger)
 
+class TagDB(db.Model):
+    """Tag object to represent one tag on one event.
+    """
+    __tablename__ = 'tags'
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    name = db.Column(db.String(25), nullable=False)
 
 class UserDB(db.Model):
     """User object stores all necessary information for a site user.
     """
     __tablename__ = 'users'
     username = db.Column(db.String(15), primary_key=True, nullable=False)
-    name = db.Column(db.String(50), nullable=False)
-    email = db.Column(db.String(50), nullable=False)
+    contact = db.Column(db.Integer, db.ForeignKey('contacts.id'), nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
 
     def hash_password(self, password):
@@ -64,7 +130,6 @@ class UserDB(db.Model):
             return None # invalid token
         user = UserDB.query.get(data['username'])
 
-
 class UserRoleEventDB(db.Model):
     """Lookup table to connect users, events and roles.
     ure_id      : integer   -> unique primary key of an entry
@@ -72,55 +137,20 @@ class UserRoleEventDB(db.Model):
     role_id     : integer   -> foreign key into roleDB
     event_id    : integer   -> foreign key into eventDB
     """
-    __tablename__ = 'userolevent'
+    __tablename__ = 'user_role_event'
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     user_id = db.Column(db.String(15), db.ForeignKey('users.username'), nullable=False)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=False)
     event_id = db.Column(db.Integer, db.ForeignKey('events.id'), nullable=False)
 
 
-class TagDB(db.Model):
-    """Tag object to represent one tag on one event.
-    """
-    __tablename__ = 'tags'
-    id = db.Column(db.Integer, primary_key=True, nullable=False)
-    name = db.Column(db.String(25), nullable=False)
 
 
-class EventTagDB(db.Model):
-    """Lookup table to connect events with tags, and similarly, users with preferences.
-    """
-    __tablename__ = 'eventag'
-    id = db.Column(db.Integer, primary_key=True, nullable=False)
-    event_id = db.Column(db.Integer, db.ForeignKey('events.id'), nullable=False)
-    tag_id = db.Column(db.Integer, db.ForeignKey('tags.id'), nullable=False)
 
 
-class AddressDB(db.Model):
-    """Address object to store necessary information. All users and locations have this.
-    type    : integer   -> 0:shipping; 1:billing; 2:both
-    """
-    __tablename__ = 'addresses'
-    id = db.Column(db.Integer, primary_key=True, nullable=False)
-    address1 = db.Column(db.String(50), nullable=False)
-    address2 = db.Column(db.String(50))
-    city = db.Column(db.String(25), nullable=False)
-    state = db.Column(db.String(25), nullable=False)
-    country = db.Column(db.String(50), nullable=False)
-    zip = db.Column(db.String(25), nullable=False)
-    type = db.Column(db.Integer, nullable=False)
 
 
-class LocationDB(db.Model):
-    """Location object to store a map location, like a park.
-    All events have this, and subsequently may have addresses.
-    Includes contact information, description, name, address, etc.
-    """
-    __tablename__ = 'locations'
-    id = db.Column(db.Integer, primary_key=True, nullable=False)
-    address_id = db.Column(db.Integer, db.ForeignKey('addresses.id'))
-    name = db.Column(db.String(50), nullable=False)
-    description = db.Column(db.String(250), nullable=False)
-    contact_name = db.Column(db.String(50), nullable=False)
-    contact_email = db.Column(db.String(50), nullable=False)
-    contact_phone = db.Column(db.Integer)
+
+
+
+
