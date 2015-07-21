@@ -1,32 +1,43 @@
-Icepiration Global Calendar tech asset repository. Flask App in development.
+## Icepiration event management flask app repo.
 
-To get set up on the project:
+##### To get set up on the project:
 
-1. Set up virtualenv
-    - run "virtualenv -p python3 venv"
-    - to activate run "source venv/bin/activate"
-    - to deactivate run "deactivate"
-2. Use pip to install dependencies (in the virtualenv)
-    - run "pip install -r pip.req". Try skipping next two commands.
-    - run "pip install -i https://testpypi.python.org/pypi Flask-Auth"
-    - run "pip install https://launchpad.net/oursql/py3k/py3k-0.9.4/+download/oursql-0.9.4.zip":
-3. Run "python run.py"
+Set up virtualenv: `$ virtualenv -p python3 venv`
 
-Database stuff:
+Activate virtualenv: `source venv/bin/activate` 
 
-Ubuntu: sudo apt-get install mysql-server libmysqlclient-dev
-Fedora: yum install python-migrate
+Use pip to install dependencies in the virtualenv: `$ pip install -r pip.req`
 
-Run the following commands:
-- "sudo mysql"
-- "create database ice;"
-- "create user 'ice'@'localhost' identified by 'ice';"
-- "grant all privileges on ice.* to 'ice'@'localhost';"
-- "flush privileges;"
-Quit out of mysql with "quit". Then run:
-- "./migrate.py db migrate"
-- "./migrate.py db upgrade"
+Run the server (CTRL+C to quit): `./run.py`
 
-To check the database subsequently, run "mysql -uice -pice"
-To change database structure, edit ice/models.py, then run migrate and upgrade again.
-If you happen to remove the migrations folder, then run init, migrate, then upgrade.
+Deactivate virtualenv: `deactivate`
+
+##### Dependency Resolution:
+
+Ubuntu: `sudo apt-get install mysql-server libmysqlclient-dev systemctl`
+
+Fedora: `yum install mysql python-migrate postfix systemctl`
+
+##### Database Setup:
+```
+$ sudo mysql
+$ create database ice;
+$ create user 'ice'@'localhost' identified by 'ice';
+$ grant all privileges on ice.* to 'ice'@'localhost';
+$ flush privileges;
+```
+
+Quit out of mysql with "quit". Then run the migrate and upgrade commands:
+
+```
+$ ./migrate.py db migrate
+$ ./migrate.py db upgrade
+```
+
+To check the database subsequently, run "mysql -uviz -pviz"
+To change database structure, edit viz/models.py, then run migrate and upgrade again.
+If you happen to remove the migrations folder, then run `./migrate.py db init`, migrate, then upgrade.
+
+Upon errors like "Cannot find MySQLd service" or "MySQL.sock" try `sudo systemctl start mariadb`
+
+Upon errors like "Email confirmation failed to send" try `sudo systemctl start postfix`
