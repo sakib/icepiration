@@ -50,7 +50,7 @@ class EventDB(db.Model):
     name = db.Column(db.String(50), nullable=False)
     price_usd = db.Column(db.Float(precision=2), nullable=False)
     start_date = db.Column(db.Date, nullable=False)
-    contact_id = db.Column(db.Integer, db.Foreignkey('contacts.id'), nullable=False)
+    contact_id = db.Column(db.Integer, db.ForeignKey('contacts.id'), nullable=False)
     event_schedule_id = db.Column(db.Integer, db.Foreignkey('event_schedules.id'), nullable=False)
     
 class EventScheduleDB(db.Model):
