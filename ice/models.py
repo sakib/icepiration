@@ -51,7 +51,7 @@ class EventDB(db.Model):
     price_usd = db.Column(db.Float(precision=2), nullable=False)
     start_date = db.Column(db.Date, nullable=False)
     contact_id = db.Column(db.Integer, db.ForeignKey('contacts.id'), nullable=False)
-    event_schedule_id = db.Column(db.Integer, db.Foreignkey('event_schedules.id'), nullable=False)
+    event_schedule_id = db.Column(db.Integer, db.ForeignKey('event_schedules.id'), nullable=False)
     
 class EventScheduleDB(db.Model):
     """EventSchedules object stores all necessary information for the schedule of an event.
