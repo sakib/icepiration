@@ -15,6 +15,7 @@ and all Events have Locations. The tables are organized as such.
 class AddressDB(db.Model):
     """Address object to store necessary information. All users and locations have this.
     type    : integer   -> 0:shipping; 1:billing; 2:both
+    Longitude and latitude will be calculated using a third party program based off address.
     """
     __tablename__ = 'addresses'
     id = db.Column(db.Integer, primary_key=True, nullable=False)
@@ -27,41 +28,41 @@ class AddressDB(db.Model):
     state = db.Column(db.String(25), nullable=False)
     type = db.Column(db.Integer, nullable=False)
     zip = db.Column(db.String(25), nullable=False)
-    
+ 
 class ContactDB(db.Model):
-    """Contacts object to store necessary information. All users and ?? have this.
-    
+    """Contacts object to store necessary information. All users, events, and locations have this.
+    type : integer -> integer used to define type.
     """
     __tablename__ = 'contacts'
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    name = db.Column(db.String(50), nullable=False)
-    email = db.Column(db.String(50))
-    phone = db.Column(db.Integer)
     address = db.Column(db.Integer, db.ForeignKey('addresses.id'), nullable=False)
     contactType = db.Column(db.Integer, nullable=False)
+    email = db.Column(db.String(50))
+    name = db.Column(db.String(50), nullable=False)
+    phone = db.Column(db.Integer)
 
 class EventDB(db.Model):
-    """Events object stores all necessary information for a site event.
+    """Events object stores all necessary information for a site event. Start date necessary for global calendar display.
     """
     __tablename__ = 'events'
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    organizer_id = db.Column(db.String(15), db.ForeignKey('users.username'), nullable=False)
+    contact_id = db.Column(db.Integer, db.ForeignKey('contacts.id'), nullable=False)
+    event_schedule_id = db.Column(db.Integer, db.ForeignKey('event_schedules.id'), nullable=False)
     location_id = db.Column(db.Integer, db.ForeignKey('locations.id'), nullable=False)
+    organizer_id = db.Column(db.String(15), db.ForeignKey('users.username'), nullable=False)
     name = db.Column(db.String(50), nullable=False)
     price_usd = db.Column(db.Float(precision=2), nullable=False)
     start_date = db.Column(db.Date, nullable=False)
-    contact_id = db.Column(db.Integer, db.ForeignKey('contacts.id'), nullable=False)
-    event_schedule_id = db.Column(db.Integer, db.ForeignKey('event_schedules.id'), nullable=False)
-    
+  
 class EventScheduleDB(db.Model):
-    """EventSchedules object stores all necessary information for the schedule of an event.
+    """EventSchedules object stores all necessary information for the schedule of an event day. Events have an EventSchedule for each day
     """
     __tablename__ = 'event_schedules'
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     event_id = db.Column(db.Integer, db.ForeignKey('events.id'), nullable=False)
-    event_start_time = db.Column(db.DateTime, nullable=False)
-    event_end_time = db.Column(db.DateTime, nullable=False)
     description = db.Column(db.String(250))
+    event_end_time = db.Column(db.DateTime, nullable=False)
+    event_start_time = db.Column(db.DateTime, nullable=False)
     
 class EventTagDB(db.Model):
     """Lookup table to connect events with tags, and similarly, users with preferences.
@@ -79,10 +80,10 @@ class LocationDB(db.Model):
     __tablename__ = 'locations'
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     address_id = db.Column(db.Integer, db.ForeignKey('addresses.id'))
-    name = db.Column(db.String(50), nullable=False)
-    description = db.Column(db.String(500))
-    type = db.Column(db.Integer, nullable=False)
     contact = db.Column(db.Integer, db.ForeignKey('contacts.id'), nullable=False)
+    description = db.Column(db.String(500))
+    name = db.Column(db.String(50), nullable=False)
+    type = db.Column(db.Integer, nullable=False)
     url = db.Column(db.String(250))
   
 class RoleDB(db.Model):
@@ -106,7 +107,7 @@ class UserDB(db.Model):
     """
     __tablename__ = 'users'
     username = db.Column(db.String(15), primary_key=True, nullable=False)
-    contact = db.Column(db.Integer, db.ForeignKey('contacts.id'), nullable=False)
+    contact_id = db.Column(db.Integer, db.ForeignKey('contacts.id'), nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
 
     def hash_password(self, password):
@@ -139,18 +140,6 @@ class UserRoleEventDB(db.Model):
     """
     __tablename__ = 'user_role_event'
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    user_id = db.Column(db.String(15), db.ForeignKey('users.username'), nullable=False)
-    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=False)
     event_id = db.Column(db.Integer, db.ForeignKey('events.id'), nullable=False)
-
-
-
-
-
-
-
-
-
-
-
-
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=False)
+    user_id = db.Column(db.String(15), db.ForeignKey('users.username'), nullable=False)
