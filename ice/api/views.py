@@ -154,7 +154,6 @@ def get_contact_json(contact):
     else:
         address = AddressDB.query.filter_by(id=contact.address).first()
         address_json = get_address_json(address)
-        return jsonify(addresses=json_addresses)
         return {'id' : contact.id,
                 'address' : address_json,
                 'contact_type' : contact.contactType,
