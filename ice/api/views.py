@@ -131,7 +131,7 @@ def role():
         off = request.args.get('offset', 0)
         role = RoleDB.query.limit(lim).offset(off).all()
         json_roles = map(get_role_json, role)
-        return jsonify(roles=json_role)
+        return jsonify(roles=json_roles)
         
         
 def get_address_json(address):
