@@ -134,15 +134,33 @@ def role():
         return jsonify(roles=json_role)
         
         
+def get_address_json(address):
+    if address is None:
+        return None
+    return {'id' : address.id,
+            'address_1' : address.address1,
+            'address_2' : address.address2,
+            'city' : address.city,
+            'country' : address.country,
+            'latitude' : address.latitude,
+            'longitude' : address.longitude,
+            'state' : address.state,
+            'type' : address.type,
+            'zip' : address.zip }
+        
 def get_contact_json(contact):
     if contact is None:
         return None
-    return {'id' : contact.id,
-            'address' : contact.address,
-            'contact_type' : contact.contactType,
-            'email' : contact.email,
-            'name' : contact.name,
-            'phone' : contact.phone }
+    else:
+        address = AddressDB.query.filter_by(id=contact.address).first()
+        address_json = get_address_json(address)
+        return jsonify(addresses=json_addresses)
+        return {'id' : contact.id,
+                'address' : address_json,
+                'contact_type' : contact.contactType,
+                'email' : contact.email,
+                'name' : contact.name,
+                'phone' : contact.phone }
 
 def get_event_json(event):
     if event is None:
