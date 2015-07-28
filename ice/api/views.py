@@ -132,9 +132,17 @@ def role():
         role = RoleDB.query.limit(lim).offset(off).all()
         json_roles = map(get_role_json, role)
         return jsonify(roles=json_role)
-
-
-
+        
+        
+def get_contact_json(contact):
+    if contact is None:
+        return None
+    return {'id' : contact.id,
+            'address' : contact.address,
+            'contact_type' : contact.contactType,
+            'email' : contact.email,
+            'name' : contact.name,
+            'phone' : contact.phone }
 
 def get_event_json(event):
     if event is None:
@@ -145,7 +153,7 @@ def get_event_json(event):
             'name': event.name,
             'price': event.price,
             'start_date': event.start_date }
-
+    #Double check and change to reflect models.py
 
 def get_user_json(user):
     if user is None:
@@ -153,6 +161,7 @@ def get_user_json(user):
     return {'username': user.username,
             'email': user.email,
             'name': user.name }
+    #Change to reflect models.py
 
 
 @auth.verify_password
