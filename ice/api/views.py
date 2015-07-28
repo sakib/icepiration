@@ -206,9 +206,9 @@ def get_role_json(role):
     if role is None:
         return none
     else:
-        return {'id' = role.id,
-                'name' = role.name,
-                'privilege' = role.privilege }
+        return {'id' : role.id,
+                'name' : role.name,
+                'privilege' : role.privilege }
 
 
 def get_user_json(user):
