@@ -215,10 +215,9 @@ def get_user_json(user):
     if user is None:
         return None
     else:
-         return {'username': user.username,
-                 'email': user.email,
-                 'name': user.name }
-    #Change to reflect models.py
+         return {'username' : user.username,
+                 'contact_id' : user.contact_id }
+    #Handle foreign key contact
 
 
 @auth.verify_password
