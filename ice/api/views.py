@@ -207,7 +207,7 @@ def get_role_json(role):
         return none
     else:
         return {'id' = role.id,
-                'name' = role. name,
+                'name' = role.name,
                 'privilege' = role.privilege }
 
 
