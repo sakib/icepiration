@@ -88,7 +88,7 @@ def address():
         off = request.args.get('offset', 0)
         address = AddressDB.query.limit(lim).offset(off).all()
         json_addresses = map(get_address_json, address)
-        return jsonify(addresses=json_address)
+        return jsonify(addresses=json_addresses)
 
 
 @app.route('/contacts', methods=['GET', 'POST'])
@@ -99,7 +99,7 @@ def contact():
         off = request.args.get('offset', 0)
         contact = ContactDB.query.limit(lim).offset(off).all()
         json_contacts = map(get_contact_json, contact)
-        return jsonify(contacts=json_contact)
+        return jsonify(contacts=json_contacts)
 
 
 @app.route('/event_schedules', methods=['GET', 'POST'])
@@ -110,7 +110,7 @@ def event_schedule():
         off = request.args.get('offset', 0)
         event_schedule = EventScheduleDB.query.limit(lim).offset(off).all()
         json_event_schedules = map(get_event_schedule_json, event_schedule)
-        return jsonify(event_schedules=json_event_schedule)
+        return jsonify(event_schedules=json_event_schedules)
 
 
 @app.route('/locations', methods=['GET', 'POST'])
@@ -121,7 +121,7 @@ def location():
         off = request.args.get('offset', 0)
         location = LocationDB.query.limit(lim).offset(off).all()
         json_locations = map(get_location_json, location)
-        return jsonify(locations=json_location)
+        return jsonify(locations=json_locations)
 
 @app.route('/roles', methods=['GET', 'POST'])
 @app.route('/roles/', methods=['GET', 'POST'])
