@@ -80,6 +80,62 @@ def event(event_id):
         return jsonify(event=get_event_json(event))
 
 
+@app.route('/addresses', methods=['GET', 'POST'])
+@app.route('/addresses/', methods=['GET', 'POST'])
+def address():
+    if request.method == 'GET':
+        lim = request.args.get('limit', 10)
+        off = request.args.get('offset', 0)
+        address = AddressDB.query.limit(lim).offset(off).all()
+        json_addresses = map(get_address_json, address)
+        return jsonify(addresses=json_address)
+
+
+@app.route('/contacts', methods=['GET', 'POST'])
+@app.route('/contacts/', methods=['GET', 'POST'])
+def contact():
+    if request.method == 'GET':
+        lim = request.args.get('limit', 10)
+        off = request.args.get('offset', 0)
+        contact = ContactDB.query.limit(lim).offset(off).all()
+        json_contacts = map(get_contact_json, contact)
+        return jsonify(contacts=json_contact)
+
+
+@app.route('/event_schedules', methods=['GET', 'POST'])
+@app.route('/event_schedules/', methods=['GET', 'POST'])
+def event_schedule():
+    if request.method == 'GET':
+        lim = request.args.get('limit', 10)
+        off = request.args.get('offset', 0)
+        event_schedule = EventScheduleDB.query.limit(lim).offset(off).all()
+        json_event_schedules = map(get_event_schedule_json, event_schedule)
+        return jsonify(event_schedules=json_event_schedule)
+
+
+@app.route('/locations', methods=['GET', 'POST'])
+@app.route('/locations/', methods=['GET', 'POST'])
+def location():
+    if request.method == 'GET':
+        lim = request.args.get('limit', 10)
+        off = request.args.get('offset', 0)
+        location = LocationDB.query.limit(lim).offset(off).all()
+        json_locations = map(get_location_json, location)
+        return jsonify(locations=json_location)
+
+@app.route('/roles', methods=['GET', 'POST'])
+@app.route('/roles/', methods=['GET', 'POST'])
+def role():
+    if request.method == 'GET':
+        lim = request.args.get('limit', 10)
+        off = request.args.get('offset', 0)
+        role = RoleDB.query.limit(lim).offset(off).all()
+        json_roles = map(get_role_json, role)
+        return jsonify(roles=json_role)
+
+
+
+
 def get_event_json(event):
     if event is None:
         return None
