@@ -137,16 +137,17 @@ def role():
 def get_address_json(address):
     if address is None:
         return None
-    return {'id' : address.id,
-            'address_1' : address.address1,
-            'address_2' : address.address2,
-            'city' : address.city,
-            'country' : address.country,
-            'latitude' : address.latitude,
-            'longitude' : address.longitude,
-            'state' : address.state,
-            'type' : address.type,
-            'zip' : address.zip }
+    else:
+        return {'id' : address.id,
+                'address_1' : address.address1,
+                'address_2' : address.address2,
+                'city' : address.city,
+                'country' : address.country,
+                'latitude' : address.latitude,
+                'longitude' : address.longitude,
+                'state' : address.state,
+                'type' : address.type,
+                'zip' : address.zip }
         
 def get_contact_json(contact):
     if contact is None:
@@ -164,20 +165,59 @@ def get_contact_json(contact):
 def get_event_json(event):
     if event is None:
         return None
-    return {'id': event.id,
-            'organizer_id': event.organizer_id,
-            'location_id': event.location_id,
-            'name': event.name,
-            'price': event.price,
-            'start_date': event.start_date }
-    #Double check and change to reflect models.py
+    else:
+        return {'id': event.id,
+                'contact_id' : event.contact_id,
+                'event_schedule_id' : event.event_schedule_id,
+                'location_id': event.location_id,
+                'organizer_id': event.organizer_id,
+                'name': event.name,
+                'price_usd': event.price_usd,
+                'start_date': event.start_date }
+    #Handle foreign keys contact, event schedule, and organizer properly.
+    
+def get_event_schedule_json(event_schedule):
+    if event_schedule is None:
+        return None
+    else:
+        return {'id' : event_schedule.id,
+                'description' : event_schedule.description,
+                'event_end_time' : event_schedule.event_end_time,
+                'event_start_time' : event_schedule.event_start_time }
+
+    
+def get_location_json(location):
+    if location is None:
+        return None
+    else:
+        contact = ContactDB.query.filter_by(id=location.contact).first()
+        contact_json = get_contact_json(contact)
+        return {'id' : location.id,
+                'address_id' : location.address_id,
+                'contact' : contact_json,
+                'description' : location.description,
+                'name' : location.name,
+                'type' : location.type,
+                'url' : location.url }
+    #Handle foreign key address
+    
+
+def get_role_json(role):
+    if role is None:
+        return none
+    else:
+        return {'id' = role.id,
+                'name' = role. name,
+                'privilege' = role.privilege }
+
 
 def get_user_json(user):
     if user is None:
         return None
-    return {'username': user.username,
-            'email': user.email,
-            'name': user.name }
+    else:
+         return {'username': user.username,
+                 'email': user.email,
+                 'name': user.name }
     #Change to reflect models.py
 
 
