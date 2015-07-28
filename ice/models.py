@@ -59,7 +59,6 @@ class EventScheduleDB(db.Model):
     """
     __tablename__ = 'event_schedules'
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    event_id = db.Column(db.Integer, db.ForeignKey('events.id'), nullable=False)
     description = db.Column(db.String(250))
     event_end_time = db.Column(db.DateTime, nullable=False)
     event_start_time = db.Column(db.DateTime, nullable=False)
