@@ -35,11 +35,12 @@ class ContactDB(db.Model):
     """
     __tablename__ = 'contacts'
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    address = db.Column(db.Integer, db.ForeignKey('addresses.id'), nullable=False)
+    address = db.Column(db.Address, nullable=False)
     contactType = db.Column(db.Integer, nullable=False)
     email = db.Column(db.String(50))
     name = db.Column(db.String(50), nullable=False)
     phone = db.Column(db.Integer)
+    #WTF
 
 class EventDB(db.Model):
     """Events object stores all necessary information for a site event. Start date necessary for global calendar display.
